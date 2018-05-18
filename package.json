@@ -1,0 +1,38 @@
+{
+  "name": "moleculer-mysql-template",
+  "version": "2.0.0",
+  "description": "Moleculer-MySQL Adapter with authentication",
+  "private": true,
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "keywords": [
+    "microservices",
+    "moleculer",
+    "moleculer-web",
+    "mysql",
+    "jsonwebtoken",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:AGenson/moleculer-mysql-template.git"
+  },
+  "homepage": "https://github.com/AGenson/moleculer-mysql-template#README",
+  "author": "Anthony Genson",
+  "devDependencies": {
+    "moleculer-repl": "^0.3.0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.2.1",
+    "moleculer": "^0.11.0",
+    "moleculer-db": "^0.7.0",
+    "moleculer-db-adapter-sequelize": "^0.1.5",
+    "moleculer-web": "^0.6.0",
+    "mysql2": "^1.5.2",
+    "password-hash": "^1.2.2"
+  },
+  "engines": {
+    "node": ">= 6.x.x"
+  }
+}
