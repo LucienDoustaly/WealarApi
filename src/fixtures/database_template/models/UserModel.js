@@ -17,7 +17,7 @@ module.exports = {
 		},
 
 		username: {
-			type: Sequelize.STRING(20),
+			type: Sequelize.STRING(36),
 			allowNull: false,
 			unique: true
 		},
@@ -33,11 +33,15 @@ module.exports = {
 			defaultValue: "USER"
 		},
 
-		WEALARID: {
-			type: Sequelize.UUID,
-			allowNull: false,
-			unique: true,
-			defaultValue: Sequelize.UUIDV4
+		phone: {
+			type: Sequelize.STRING(10),
+			allowNull: true,
+			defaultValue: null
+		},
+
+		preferences: {
+			type: Sequelize.JSON,
+			allowNull: false
 		}
 	},
 	options: {

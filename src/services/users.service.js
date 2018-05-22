@@ -1,5 +1,6 @@
 "use strict";
 
+const uuidv4 = require('uuid/v4');
 const passwordHash = require('password-hash');
 const { MoleculerError } 	= require("moleculer").Errors;
 const Database = require("../adapters/Database");
@@ -9,16 +10,21 @@ const CodeTypes = require("../fixtures/error.codes");
 // Filters applied when searching for entities
 // Elements correspond to the columns of the table
 const Filters_Users = {
-	full: ["id", "username", "password", "role"],
 	role: ["id", "role"],
-	restricted: ["username"],
-	unrestricted: ["username", "age"]
+	infos: ["id", "username", "role", "phone", "preferences"]
 };
 const Filters_Tokens = {
 	empty: ["id"]
 };
 
 const Roles = ["ADMIN", "USER"];
+
+const Default_Preferences = {
+	securityMode: 0,
+	smsNotification: false,
+	weatherNotification: false,
+	presenceNotification: false
+};
 
 
 
@@ -31,24 +37,22 @@ module.exports = {
 
 		create: {
 			params: {
-				username: "string",
 				password: "string"
 			},
 			handler(ctx) {
 				return this.generateHash(ctx.params.password)
-					.then( (res) => this.DB_Users.insert(ctx, {
-						username: ctx.params.username,
-						password: res.data
-					}))
+					.then( (res) => {
+						var wealar_id = uuidv4();
+						
+						return this.DB_Users.insert(ctx, {
+							id: wealar_id,
+							username: wealar_id,
+							password: res.data,
+							preferences: Default_Preferences
+						});
+					})
 					.then( () => this.requestSuccess("User Account Created", ctx.params.username) )
-					.catch( (err) => {
-						if (err.name === 'Database Error' && Array.isArray(err.data)){
-							if (err.data[0].type === 'unique' && err.data[0].field === 'username')
-								return this.requestError(CodeTypes.USERS_USERNAME_CONSTRAINT);
-						}
-
-						return this.requestError(CodeTypes.UNKOWN_ERROR);
-					});
+					.catch( (err) => this.requestError(CodeTypes.UNKOWN_ERROR));
 			}
 		},
 
@@ -57,7 +61,7 @@ module.exports = {
 
 			},
 			handler(ctx) {
-				return this.verifyIfLogged(ctx)
+				return this.verifyIfAdmin(ctx)
 					.then( () => this.DB_Users.find(ctx, { }) )
 					.then( (res) => this.requestSuccess("Search Complete", res.data) )
 					.catch( (err) => {
@@ -71,15 +75,13 @@ module.exports = {
 
 		get: {
 			params: {
-				username: "string"
+				
 			},
 			handler(ctx) {
 				return this.verifyIfLogged(ctx)
-					.then( () => this.DB_Users.findOne(ctx, {
-						query: {
-							username: ctx.params.username
-						},
-						filter: (ctx.params.username === ctx.meta.user.username) ? Filters_Users.unrestricted : Filters_Users.restricted
+					.then( () => this.DB_Users.findById(ctx, {
+						id: ctx.meta.user.id,
+						filter: Filters_Users.infos
 					}))
 					.then( (res) => this.requestSuccess("Search Complete", res.data) )
 					.catch( (err) => {
@@ -96,23 +98,84 @@ module.exports = {
 
 			},
 			handler(ctx) {
-				return this.DB_Users.count(ctx, { })
+				return this.verifyIfAdmin(ctx)
+					.then( () => this.DB_Users.count(ctx, { }) )
 					.then( (res) => this.requestSuccess("Count Complete", res.data) )
-					.catch( (err) => this.requestError(CodeTypes.UNKOWN_ERROR) );
+					.catch( (err) => {
+						if (err instanceof MoleculerError)
+							return Promise.reject(err);
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
 			}
 		},
 
-		changeInfo: {
+		changeUsername: {
 			params: {
-				age: "number"
+				username: "string"
 			},
 			handler(ctx) {
 				return this.verifyIfLogged(ctx)
 					.then( () => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
-						age: ctx.params.age
+						username: ctx.params.username
+					}))
+					.then( (res) => this.requestSuccess("Changes Saved", true) )
+					.catch( (err) => {
+						if (err.name === 'Database Error' && Array.isArray(err.data)){
+							if (err.data[0].type === 'unique' && err.data[0].field === 'username')
+								return this.requestError(CodeTypes.USERS_USERNAME_CONSTRAINT);
+						}
+
+						return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
+			}
+		},
+
+		changePhone: {
+			params: {
+				phone: "string"
+			},
+			handler(ctx) {
+				return this.verifyIfLogged(ctx)
+					.then( () => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
+						phone: ctx.params.phone
 					}))
 					.then( (res) => this.requestSuccess("Changes Saved", true) )
 					.catch( (err) => this.requestError(CodeTypes.UNKOWN_ERROR) );
+			}
+		},
+
+		changePreferences: {
+			params: {
+				securityMode: "number",
+				smsNotification: "boolean",
+				weatherNotification: "boolean",
+				presenceNotification: "boolean"
+			},
+			handler(ctx) {
+				return this.verifyIfLogged(ctx)
+					.then( () => {
+						if ((ctx.params.securityMode >= 0) && (ctx.params.securityMode < 3))
+							return this.requestSuccess("Security Mode Valid", true);
+						else
+							return this.requestError(CodeTypes.USERS_MODE_CONSTRAINT);
+					})
+					.then( () => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
+						preferences: {
+							securityMode: ctx.params.securityMode,
+							smsNotification: ctx.params.smsNotification,
+							weatherNotification: ctx.params.weatherNotification,
+							presenceNotification: ctx.params.presenceNotification
+						}
+					}))
+					.then( (res) => this.requestSuccess("Changes Saved", true) )
+					.catch( (err) => {
+						console.log("IIIIIICCCCCCCCCCIIIIIII",err);
+						if (err instanceof MoleculerError)
+							return Promise.reject(err);
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
 			}
 		},
 
@@ -273,13 +336,17 @@ module.exports = {
 						role: "ADMIN"
 					})
 					.then( (res) => {
-						if (res.data === 0)
+						if (res.data === 0) {
+							var wealar_id = uuidv4();
+
 							return this.generateHash("admin")
 								.then( (res) => this.DB_Users.insert(ctx, {
 									username: "admin",
 									password: res.data,
-									role: "ADMIN"
+									role: "ADMIN",
+									preferences: Default_Preferences
 								}));
+						}
 						else
 							return Promise.resolve(true);
 					})
@@ -343,7 +410,7 @@ module.exports = {
 	},
 
 	created() {
-		this.DB_Users = new Database("User", Filters_Users.restricted);
+		this.DB_Users = new Database("User", Filters_Users.infos);
 		this.DB_Tokens = new Database("Token", Filters_Tokens.empty);
 	}
 };

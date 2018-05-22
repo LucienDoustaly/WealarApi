@@ -80,7 +80,9 @@ module.exports = {
 					"auth.closeAllSessions",
 					"users.getAll",
 					"users.get",
-					"users.changeInfo",
+					"users.changeUsername",
+					"users.changePhone",
+					"users.changePreferences",
 					"users.changePassword",
 					"users.remove"
 				],
@@ -93,66 +95,11 @@ module.exports = {
 					// Users: Actions on Users that does not need priviledges
 					"GET users": "users.getAll",
 					"GET user/:username": "users.get",
-					"PUT user/change/infos": "users.changeInfo",
+					"PUT user/change/infos/username": "users.changeUsername",
+					"PUT user/change/infos/phone": "users.changePhone",
+					"PUT user/change/infos/preferences": "users.changePreferences",
 					"PUT user/change/password": "users.changePassword",
 					"DELETE user": "users.remove",
-				}
-			},
-			{
-				path: "/greeter/",
-				authorization: false,
-				whitelist: [
-					"greeter.*"
-				],
-				aliases: {
-					"GET hello": "greeter.hello",
-					"POST welcome/:name": "greeter.welcome"
-				}
-			},
-			{
-				bodyParsers: {
-	                json: true,
-	            },
-				path: "/services/",
-				roles: ["ADMIN", "USER"],
-				authorization: true,
-				whitelist: [
-					"serviceA.*",
-					"serviceB.*"
-				],
-				aliases: {
-					// ServiceA: Table1 only
-					"POST A/one": "serviceA.create",
-					"POST A/many": "serviceA.createMany",
-					"GET A/all": "serviceA.getAll",
-					"GET A/ids": "serviceA.getAllIds",
-					"GET A/first/:first": "serviceA.getByFirst",
-					"GET A/id/:id": "serviceA.getById",
-					"GET A/count": "serviceA.count",
-					"PUT A/one": "serviceA.update",
-					"PUT A/many": "serviceA.updateMany",
-					"DELETE A/byId/:id": "serviceA.remove",
-					"DELETE A/byFirst/:first": "serviceA.removeByFirst",
-					"DELETE A/byThird/:third": "serviceA.removeByThird",
-					"DELETE A/all": "serviceA.removeAll",
-
-					// ServiceB: Table2 only
-					"POST B/one": "serviceB.create",
-					"POST B/many": "serviceB.createMany",
-					"GET B/all": "serviceB.getAll",
-					"GET B/ids": "serviceB.getAllIds",
-					"GET B/first/:first": "serviceB.getByFirst",
-					"GET B/id/:id": "serviceB.getById",
-					"GET B/count": "serviceB.count",
-					"PUT B/one": "serviceB.update",
-					"PUT B/many": "serviceB.updateMany",
-					"DELETE B/byId/:id": "serviceB.remove",
-					"DELETE B/byFirst/:first": "serviceB.removeByFirst",
-					"DELETE B/byThird/:third": "serviceB.removeByThird",
-					"DELETE B/all": "serviceB.removeAll",
-
-					// ServiceB: Table1 & Table2
-					"GET B/all/tables": "serviceB.getAll_1_2"
 				}
 			}
 

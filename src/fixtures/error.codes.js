@@ -16,6 +16,7 @@ module.exports = {
 	USERS_NOT_LOGGED_ERROR: "User Not Logged",
 	USERS_NOTHING_FOUND: "Unknown Username",
 	USERS_USERNAME_CONSTRAINT: "Invalid Username",
+	USERS_MODE_CONSTRAINT: "Invalid Security Mode",
 	USERS_FORBIDDEN_REMOVE: "Forbidden Remove",
 	USERS_INVALID_ROLE: "Invalid Role",
 

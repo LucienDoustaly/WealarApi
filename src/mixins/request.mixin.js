@@ -75,6 +75,11 @@ module.exports = {
 					code = 417;
 					break;
 
+				case CodeTypes.USERS_MODE_CONSTRAINT:
+					message = "Security mode is an integer between 0 and 2";
+					code = 417;
+					break;
+
 				case CodeTypes.USERS_FORBIDDEN_REMOVE:
 					message = "ADMIN User cannot be removed";
 					code = 403;

@@ -12,8 +12,8 @@ const CodeTypes = require("../fixtures/error.codes");
 // Filters applied when searching for entities
 // Elements correspond to the columns of the table
 const Filters_Users = {
-	security: ["id", "username", "password", "role", "WEALARID"],
-	encode: ["id", "username", "role","WEALARID"]
+	security: ["id", "username", "password", "role", "phone", "preferences"],
+	encode: ["id", "username", "role", "phone", "preferences"]
 };
 const Filters_Tokens = {
 	empty: ["id"]
@@ -44,7 +44,7 @@ module.exports = {
 										userId: res.data.id,
 										token: res2
 									})
-									.then( () => this.requestSuccess("Login Success", { Token: res2,UserName: res.data.username, WEALARID: res.data.WEALARID}));
+									.then( () => this.requestSuccess("Login Success", { Token: res2, UserName: res.data.username, WEALARID: res.data.id, Phone: res.data.phone, Preferences: res.data.preferences}));
 							})
 					})
 					.catch( (err) => {
