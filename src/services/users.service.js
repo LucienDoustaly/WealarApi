@@ -110,14 +110,16 @@ module.exports = {
 			}
 		},
 
-		changeUsername: {
+		changeInformation: {
 			params: {
-				username: "string"
+				username: "string",
+				phone: "string"
 			},
 			handler(ctx) {
 				return this.verifyIfLogged(ctx)
 					.then( () => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
-						username: ctx.params.username
+						username: ctx.params.username,
+						phone: ctx.params.phone
 					}))
 					.then( (res) => this.requestSuccess("Changes Saved", true) )
 					.catch( (err) => {
@@ -128,20 +130,6 @@ module.exports = {
 
 						return this.requestError(CodeTypes.UNKOWN_ERROR);
 					});
-			}
-		},
-
-		changePhone: {
-			params: {
-				phone: "string"
-			},
-			handler(ctx) {
-				return this.verifyIfLogged(ctx)
-					.then( () => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
-						phone: ctx.params.phone
-					}))
-					.then( (res) => this.requestSuccess("Changes Saved", true) )
-					.catch( (err) => this.requestError(CodeTypes.UNKOWN_ERROR) );
 			}
 		},
 

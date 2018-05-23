@@ -80,8 +80,7 @@ module.exports = {
 					"auth.closeAllSessions",
 					"users.getAll",
 					"users.get",
-					"users.changeUsername",
-					"users.changePhone",
+					"users.changeInformation",
 					"users.changePreferences",
 					"users.changePassword",
 					"users.remove"
@@ -95,8 +94,7 @@ module.exports = {
 					// Users: Actions on Users that does not need priviledges
 					"GET users": "users.getAll",
 					"GET user/:username": "users.get",
-					"PUT user/change/infos/username": "users.changeUsername",
-					"PUT user/change/infos/phone": "users.changePhone",
+					"PUT user/change/infos/userinfos": "users.changeInformation",
 					"PUT user/change/infos/preferences": "users.changePreferences",
 					"PUT user/change/password": "users.changePassword",
 					"DELETE user": "users.remove",
