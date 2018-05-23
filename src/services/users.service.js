@@ -186,7 +186,6 @@ module.exports = {
 					}))
 					.then( (res) => this.requestSuccess("Changes Saved", true) )
 					.catch( (err) => {
-						console.log("IIIIIICCCCCCCCCCIIIIIII",err);
 						if (err instanceof MoleculerError)
 							return Promise.reject(err);
 						else
@@ -207,7 +206,7 @@ module.exports = {
 					.then( (res) => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
 						password: res.data
 					}))
-					.then( () => ctx.call("auth.closeAllSessions"))
+					//.then( () => ctx.call("auth.closeAllSessions"))
 					.then( () => this.requestSuccess("Changes Saved", true) )
 					.catch( (err) => {
 						if (err instanceof MoleculerError)
