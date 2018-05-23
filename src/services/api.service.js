@@ -81,6 +81,7 @@ module.exports = {
 					"users.getAll",
 					"users.get",
 					"users.changeInformation",
+					"users.firstCo",
 					"users.changePreferences",
 					"users.changePassword",
 					"users.remove"
@@ -94,6 +95,7 @@ module.exports = {
 					// Users: Actions on Users that does not need priviledges
 					"GET users": "users.getAll",
 					"GET user/:username": "users.get",
+					"PUT user/change/infos/firstco": "users.firstCo",
 					"PUT user/change/infos/userinfos": "users.changeInformation",
 					"PUT user/change/infos/preferences": "users.changePreferences",
 					"PUT user/change/password": "users.changePassword",

@@ -133,6 +133,34 @@ module.exports = {
 			}
 		},
 
+		firstCo: {
+			params: {
+				username: "string",
+				phone: "string",
+				oldPassword: "string",
+				newPassword: "string"
+			},
+			handler(ctx) {
+				return this.verifyIfLogged(ctx)
+					.then( () => ctx.call("auth.verifyPassword", { username: ctx.meta.user.username, password: ctx.params.oldPassword}))
+					.then( () => this.generateHash(ctx.params.newPassword) )
+					.then( (res) => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
+						username: ctx.params.username,
+						phone: ctx.params.phone,
+						password: res.data
+					}))
+					.then( (res) => this.requestSuccess("Changes Saved", true) )
+					.catch( (err) => {
+						if (err.name === 'Database Error' && Array.isArray(err.data)){
+							if (err.data[0].type === 'unique' && err.data[0].field === 'username')
+								return this.requestError(CodeTypes.USERS_USERNAME_CONSTRAINT);
+						}
+
+						return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
+			}
+		},
+
 		changePreferences: {
 			params: {
 				securityMode: "number",
