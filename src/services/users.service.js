@@ -10,6 +10,7 @@ const CodeTypes = require("../fixtures/error.codes");
 // Filters applied when searching for entities
 // Elements correspond to the columns of the table
 const Filters_Users = {
+	username: ["username"],
 	role: ["id", "role"],
 	infos: ["id", "username", "role", "phone", "preferences"]
 };
@@ -43,7 +44,7 @@ module.exports = {
 				return this.generateHash(ctx.params.password)
 					.then( (res) => {
 						var wealar_id = uuidv4();
-						
+
 						return this.DB_Users.insert(ctx, {
 							id: wealar_id,
 							username: wealar_id,
@@ -75,13 +76,12 @@ module.exports = {
 
 		get: {
 			params: {
-				
+
 			},
 			handler(ctx) {
 				return this.verifyIfLogged(ctx)
 					.then( () => this.DB_Users.findById(ctx, {
-						id: ctx.meta.user.id,
-						filter: Filters_Users.infos
+						id: ctx.meta.user.id
 					}))
 					.then( (res) => this.requestSuccess("Search Complete", res.data) )
 					.catch( (err) => {
@@ -141,8 +141,7 @@ module.exports = {
 				newPassword: "string"
 			},
 			handler(ctx) {
-				return this.verifyIfLogged(ctx)
-					.then( () => ctx.call("auth.verifyPassword", { username: ctx.meta.user.username, password: ctx.params.oldPassword}))
+				return this.verifyUserPassword(ctx, ctx.params.oldPassword)
 					.then( () => this.generateHash(ctx.params.newPassword) )
 					.then( (res) => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
 						username: ctx.params.username,
@@ -200,8 +199,7 @@ module.exports = {
 				newPassword: "string"
 			},
 			handler(ctx) {
-				return this.verifyIfLogged(ctx)
-					.then( () => ctx.call("auth.verifyPassword", { username: ctx.meta.user.username, password: ctx.params.oldPassword}))
+				return this.verifyUserPassword(ctx, ctx.params.oldPassword)
 					.then( () => this.generateHash(ctx.params.newPassword) )
 					.then( (res) => this.DB_Users.updateById(ctx, ctx.meta.user.id, {
 						password: res.data
@@ -225,8 +223,12 @@ module.exports = {
 			handler(ctx) {
 				return this.verifyIfAdmin(ctx)
 					.then( () => this.verifyRole(ctx.params.role) )
-					.then( () => {
-						if ((ctx.meta.user.username === ctx.params.username) && (ctx.params.role !== "ADMIN"))
+					.then( () => this.DB_Users.findById(ctx, {
+						id: ctx.meta.user.id,
+						filter: Filters_Users.username
+					}))
+					.then( (res) => {
+						if ((res.data === ctx.params.username) && (ctx.params.role !== "ADMIN"))
 							return this.isLastAdmin(ctx)
 								.then( (res) => {
 									if (res.data === false)
@@ -274,7 +276,7 @@ module.exports = {
 						else
 							return this.requestError(CodeTypes.USERS_FORBIDDEN_REMOVE);
 					})
-					.then( () => ctx.call("auth.verifyPassword", { username: ctx.meta.user.username, password: ctx.params.password}))
+					.then( () => this.verifyUserPassword(ctx, ctx.params.password))
 					.then( () => ctx.call("auth.closeAllSessions") )
 					.then( () => this.DB_Users.removeById(ctx, ctx.meta.user.id))
 					.then( () => this.requestSuccess("Delete Complete", true) )
@@ -328,7 +330,7 @@ module.exports = {
 			},
 			handler(ctx) {
 				return this.verifyIfAdmin(ctx)
-					.then( () => ctx.call("auth.verifyPassword", { username: ctx.meta.user.username, password: ctx.params.password}))
+					.then( () => this.verifyUserPassword(ctx, ctx.params.oldPassword) )
 					.then( () => this.DB_Tokens.removeAll(ctx) )
 					.then( () => this.DB_Users.removeAll(ctx) )
 					.then( () => ctx.call("users.createAdminIfNotExists"))
@@ -420,6 +422,21 @@ module.exports = {
 					else
 						return Promise.reject(err);
 				});
+		},
+
+		verifyUserPassword(ctx, password){
+			return this.verifyIfLogged(ctx)
+			.then( () => this.DB_Users.findById(ctx, {
+				id: ctx.meta.user.id,
+				filter: Filters_Users.username
+			}))
+			.then( (res) => ctx.call("auth.verifyPassword", { username: res.data, password: password}))
+			.catch( (err) => {
+				if (err instanceof MoleculerError)
+					return Promise.reject(err);
+				else
+					return this.requestError(CodeTypes.UNKOWN_ERROR);
+			});
 		}
 
 	},

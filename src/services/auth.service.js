@@ -13,7 +13,8 @@ const CodeTypes = require("../fixtures/error.codes");
 // Elements correspond to the columns of the table
 const Filters_Users = {
 	security: ["id", "username", "password", "role", "phone", "preferences"],
-	encode: ["id", "username", "role", "phone", "preferences"]
+	infos: ["id", "username", "role", "phone", "preferences"],
+	encode: ["id", "role"]
 };
 const Filters_Tokens = {
 	empty: ["id"]
@@ -38,7 +39,7 @@ module.exports = {
 			handler(ctx) {
 				return ctx.call("auth.verifyPassword", { username: ctx.params.username, password: ctx.params.password })
 					.then( (res) => {
-						return this.generateToken(res.data)
+						return this.generateToken(pick(res.data, Filters_Users.encode))
 							.then( (res2) => {
 								return this.DB_Tokens.insert(ctx, {
 										userId: res.data.id,
@@ -70,7 +71,7 @@ module.exports = {
 					})
 					.then( (res) => {
 						if (passwordHash.verify(ctx.params.password, res.data.password))
-							return this.requestSuccess("Valid Password", pick(res.data, Filters_Users.encode));
+							return this.requestSuccess("Valid Password", pick(res.data, Filters_Users.infos));
 						else
 							return this.requestError(CodeTypes.AUTH_INVALID_CREDENTIALS);
 					})
