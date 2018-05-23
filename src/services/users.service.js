@@ -430,7 +430,7 @@ module.exports = {
 				id: ctx.meta.user.id,
 				filter: Filters_Users.username
 			}))
-			.then( (res) => ctx.call("auth.verifyPassword", { username: res.data, password: password}))
+			.then( (res) => ctx.call("auth.verifyPassword", { username: res.data.username, password: password}))
 			.catch( (err) => {
 				if (err instanceof MoleculerError)
 					return Promise.reject(err);
