@@ -188,9 +188,26 @@ module.exports = {
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
 					});
 			}
-		}
+		},
+
+		postTest:{
+			params: {
+
+			},
+			handler(ctx) {
+				return this.verifyIfLogged(ctx)
+					.then( () => console.log("COUCOUUUUUU") )
+					.then( (res) => "SUCESS" )
+					.catch( (err) => {
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
+			}
+		},
+
+
 
 	},
+
 
 	methods: {
 

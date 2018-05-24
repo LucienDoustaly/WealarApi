@@ -39,14 +39,18 @@ module.exports = {
 				authorization: false,
 				whitelist: [
 					"auth.login",
-					"users.create"
+					"users.create",
+					"product.postTest"
 				],
 				aliases: {
 					// Auth: login only
 					"POST login": "auth.login",
 
 					// Users: create User account only
-					"POST user": "users.create"
+					"POST user": "users.create",
+
+					//Test post
+					"POST test": "product.postTest"
 				}
 			},
 			{
