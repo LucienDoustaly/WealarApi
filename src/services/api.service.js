@@ -47,10 +47,26 @@ module.exports = {
 					"POST login": "auth.login",
 
 					// Users: create User account only
-					"POST user": "users.create",
-
+					"POST user": "users.create"
+				}
+			},
+			{
+				bodyParsers: {
+						json: true,
+				},
+				path: "/wealar/",
+				authorization: false,
+				whitelist: [
+					"product.*"
+				],
+				aliases: {
 					//Test post
-					"POST test": "product.postTest"
+					"POST test": "product.postTest",
+
+          "POST alarm/:mode": "greeter.alarm",
+          "POST off": "greeter.off",
+          "POST presence": "greeter.presence",
+          "POST weather/:temperature/:humidity/:night": "greeter.weather"
 				}
 			},
 			{

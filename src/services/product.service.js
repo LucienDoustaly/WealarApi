@@ -200,6 +200,48 @@ module.exports = {
 			}
 		},
 
+		alarm: {
+			params: {
+				mode: "string"
+			},
+			handler(ctx) {
+				console.log("\n\nAlarm activated !\nSecurity mode: "+ctx.params.mode+"\n\n");
+				return "Request Success";
+			}
+		},
+
+		off: {
+			params: {
+
+			},
+			handler(ctx) {
+				console.log("\n\nAlarm Off !!!\n\n");
+				return "Request Success";
+			}
+		},
+
+		presence: {
+			params: {
+
+			},
+			handler(ctx) {
+				console.log("\n\nPresence detected !!!\n\n");
+				return "Request Success";
+			}
+		},
+
+		weather: {
+			params: {
+				temperature: "string",
+				humidity: "string",
+				night: "string"
+			},
+			handler(ctx) {
+				console.log("\n\nNight: "+((ctx.params.night[0] == '1') ? true : false)+"\nTemperature: "+ctx.params.temperature+"°C\nHumidity: "+ctx.params.humidity+"%\n\n");
+				return "Request Success";
+			}
+		}
+
 
 
 	},
