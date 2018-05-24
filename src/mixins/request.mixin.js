@@ -22,42 +22,6 @@ module.exports = {
 
 			switch (codeError) {
 
-				// Errors on Table1
-
-				case CodeTypes.T1_NOTHING_FOUND:
-					message = "No entity found in Table1 with the given parameters";
-					code = 404;
-					break;
-
-				case CodeTypes.T1_FIRST_CONSTRAINT:
-					message = "First must be unique: not all entities have been inserted or updated";
-					code = 417;
-					break;
-
-				case CodeTypes.T1_THIRD_CONSTRAINT:
-					message = "Third must be a number";
-					code = 417;
-					break;
-
-				// Errors on Table2
-
-				case CodeTypes.T2_NOTHING_FOUND:
-					message = "No entity found in Table2 with the given parameters";
-					code = 404;
-					break;
-
-				case CodeTypes.T2_SECOND_CONSTRAINT:
-					message = "Second must be a number";
-					code = 417;
-					break;
-
-				// Errors on Table1 & Table2
-
-				case CodeTypes.T1_T2_NOTHING_FOUND:
-					message = "Table1 or Table2 is empty";
-					code = 404;
-					break;
-
 				// Errors on Users
 
 				case CodeTypes.USERS_NOT_LOGGED_ERROR:
@@ -66,7 +30,7 @@ module.exports = {
 					break;
 
 				case CodeTypes.USERS_NOTHING_FOUND:
-					message = "Username does not exist";
+					message = "WealarId does not exist";
 					code = 404;
 					break;
 
@@ -115,6 +79,18 @@ module.exports = {
 				case CodeTypes.AUTH_NO_TOKEN:
 					message = "Missing Token: a logged User is required for this kind of request";
 					code = 401;
+					break;
+
+				// Errors on Products
+
+				case CodeTypes.WEATHER_NOTHING_FOUND:
+					message = "No weather data collected from the product yet";
+					code = 404;
+					break;
+
+				case CodeTypes.PRESENCE_NOTHING_FOUND:
+					message = "No presence has been detected from the product yet";
+					code = 404;
 					break;
 
 				// Unknown Error
