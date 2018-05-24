@@ -195,12 +195,8 @@ module.exports = {
 
 			},
 			handler(ctx) {
-				return this.verifyIfLogged(ctx)
-					.then( () => console.log("COUCOUUUUUU") )
-					.then( (res) => "SUCESS" )
-					.catch( (err) => {
-							return this.requestError(CodeTypes.UNKOWN_ERROR);
-					});
+				console.log("COUCOU");
+				return "Success";
 			}
 		},
 
