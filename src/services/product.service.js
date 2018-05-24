@@ -103,7 +103,7 @@ module.exports = {
 				wealarId: "string"
 			},
 			handler(ctx) {
-				var today = (new Date()).getDate();
+				var today = this.getDate();
 				var presence = Default_Data;
 
 				return this.verifyWealarId(ctx)
