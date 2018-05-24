@@ -196,7 +196,7 @@ module.exports = {
 			},
 			handler(ctx) {
 				console.log("COUCOU");
-				return "Success";
+				return "Request Success (test)";
 			}
 		},
 
@@ -206,7 +206,7 @@ module.exports = {
 			},
 			handler(ctx) {
 				console.log("\n\nAlarm activated !\nSecurity mode: "+ctx.params.mode+"\n\n");
-				return "Request Success";
+				return "Done";
 			}
 		},
 
@@ -216,7 +216,7 @@ module.exports = {
 			},
 			handler(ctx) {
 				console.log("\n\nAlarm Off !!!\n\n");
-				return "Request Success";
+				return "Done";
 			}
 		},
 
@@ -226,7 +226,7 @@ module.exports = {
 			},
 			handler(ctx) {
 				console.log("\n\nPresence detected !!!\n\n");
-				return "Request Success";
+				return "Done";
 			}
 		},
 
@@ -238,7 +238,7 @@ module.exports = {
 			},
 			handler(ctx) {
 				console.log("\n\nNight: "+((ctx.params.night[0] == '1') ? true : false)+"\nTemperature: "+ctx.params.temperature+"°C\nHumidity: "+ctx.params.humidity+"%\n\n");
-				return "Request Success";
+				return "Done";
 			}
 		}
 

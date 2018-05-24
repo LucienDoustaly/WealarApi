@@ -63,10 +63,10 @@ module.exports = {
 					//Test post
 					"POST test": "product.postTest",
 
-          "POST alarm/:mode": "greeter.alarm",
-          "POST off": "greeter.off",
-          "POST presence": "greeter.presence",
-          "POST weather/:temperature/:humidity/:night": "greeter.weather"
+          "POST alarm/:mode": "product.alarm",
+          "POST off": "product.off",
+          "POST presence": "product.presence",
+          "POST weather/:temperature/:humidity/:night": "product.weather"
 				}
 			},
 			{
