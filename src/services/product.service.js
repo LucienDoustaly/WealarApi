@@ -145,7 +145,8 @@ module.exports = {
 							return Promise.reject(err);
 						else
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
-					});
+					})
+					.then( () => "Done");
 			}
 		},
 
