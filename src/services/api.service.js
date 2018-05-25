@@ -71,6 +71,7 @@ module.exports = {
 					json: true,
 				},
 				path: "/data/",
+				roles: ["ADMIN","USER"],
 				authorization: true,
 				whitelist: [
 					"product.*"
