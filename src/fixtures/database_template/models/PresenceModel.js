@@ -21,6 +21,18 @@ module.exports = {
 			allowNull: false
 		},
 
+		activated: {
+			type: Sequelize.BOOLEAN,
+			allowNull: false,
+			defaultValue: false
+		},
+
+		new: {
+			type: Sequelize.BOOLEAN,
+			allowNull: false,
+			defaultValue: false
+		},
+
 		presence: {
 			type: Sequelize.JSON,
 			allowNull: false

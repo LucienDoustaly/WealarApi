@@ -18,7 +18,8 @@ const Filters_Presence = {
 	empty: ["id"]
 };
 const Filters_Users = {
-	wealarId: ["id"]
+	wealarId: ["id"],
+	preferences: ["preferences"]
 };
 
 const Default_Data = {
@@ -65,24 +66,21 @@ module.exports = {
 						else
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
 					})
-					.then( () => this.requestSuccess("Weather data formated", [{
-						hour: this.getTime(),
-						infos: {
-							temperature: parseInt(ctx.params.temperature, 10),
-							humidity: parseInt(ctx.params.humidity, 10),
-							night: (ctx.params.night === "1")
-						}
-					}]))
 					.then( (res) => this.DB_Weather.updateMany(ctx, {
 						wealarId: ctx.params.wealarId,
 						date: today
 					}, {
-						weather: res.data
+						weather: [{
+							hour: this.getTime(),
+							infos: {
+								temperature: parseInt(ctx.params.temperature, 10),
+								humidity: parseInt(ctx.params.humidity, 10),
+								night: (ctx.params.night === "1")
+							}
+						}]
 					}))
 					.then( () => "Done" )
-					.catch( (err) => {
-						console.log(err);
-						return CodeTypes.UNKOWN_ERROR });
+					.catch( (err) => CodeTypes.UNKOWN_ERROR );
 			}
 		},
 
@@ -91,49 +89,105 @@ module.exports = {
 				wealarId: "string"
 			},
 			handler(ctx) {
-				var today = this.getDate();
-				var presence = Default_Data;
-
 				return this.verifyWealarId(ctx)
-					.then( () => this.DB_Presence.findOne(ctx, {
-						query: {
-							wealarId: ctx.params.wealarId,
-							date: today
-						}
-					}))
-					.then( (res) => {
-						presence = res.data.presence;
-
-						return this.requestSuccess("Presence data retreived", res.data.wealarId);
-					})
-					.catch( (err) => {
-						if (err.name === 'Nothing Found')
-							return this.DB_Presence.insert(ctx, {
-								wealarId: ctx.params.wealarId,
-								date: today,
-								presence: Default_Data
-							})
-						else
-							return this.requestError(CodeTypes.UNKOWN_ERROR);
-					})
-					.then( (res) => {
-						presence.push(this.getTime());
-
-						return this.requestSuccess("Presence data formated", true);
-					})
+					.then( () => this.insertPresence(ctx, ctx.params.wealarId) )
 					.then( () => this.DB_Presence.updateMany(ctx, {
-						wealarId: ctx.params.wealarId,
-						date: today
+						wealarId: ctx.params.wealarId
 					}, {
-						presence: presence
+						activated: true,
+						presence: [{
+							date: this.getDate(),
+							time: this.getTime()
+						}],
+						new: true
 					}))
+					.then( () => "Done")
 					.catch( (err) => {
 						if (err instanceof MoleculerError)
 							return Promise.reject(err);
 						else
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
-					})
-					.then( () => "Done");
+					});
+			}
+		},
+
+		ignorePresence: {
+			params: {
+
+			},
+			handler(ctx) {
+				return this.verifyIfLogged(ctx)
+					.then( () => this.insertPresence(ctx, ctx.meta.user.id) )
+					.then( () => this.DB_Presence.updateMany(ctx, {
+						wealarId: ctx.meta.user.id
+					}, {
+						new: false,
+						presence: Default_Data
+					}))
+					.then( () => this.requestSuccess("Presence ignored", true) )
+					.catch( (err) => {
+						if (err instanceof MoleculerError)
+							return Promise.reject(err);
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
+			}
+		},
+
+		setAlarm: {
+			params: {
+				wealarId: "string",
+				mode: "string"
+			},
+			handler(ctx) {
+				var value = parseInt(ctx.params.mode, 10);
+
+				return this.verifyWealarId(ctx)
+					.then( () => this.insertPresence(ctx, ctx.params.wealarId) )
+					.then( () => this.DB_Presence.updateMany(ctx, {
+						wealarId: ctx.meta.user.id
+					}, {
+						activated: true
+					}))
+					.then( () => this.DB_Users.findById(ctx, {
+						id: ctx.params.wealarId,
+						filter: Filters_Users.preferences
+					}))
+					.then( (res) => this.DB_Users.updateById(ctx, ctx.params.wealarId, {
+						preferences: {
+							...res.data.preferences,
+							securityMode: ((value === 1) || (value === 2)) ? value : 0
+						}
+					}))
+					.then( () => this.requestSuccess("Alarm activated", true) )
+					.catch( (err) => {
+						if (err instanceof MoleculerError)
+							return Promise.reject(err);
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
+			}
+		},
+
+		stopAlarm: {
+			params: {
+				wealarId: "string"
+			},
+			handler(ctx) {
+				return this.verifyWealarId(ctx)
+					.then( () => this.insertPresence(ctx, ctx.params.wealarId) )
+					.then( () => this.DB_Presence.updateMany(ctx, {
+						wealarId: ctx.meta.user.id
+					}, {
+						activated: false
+					}))
+					.then( () => this.requestSuccess("Alarm deactivated", true) )
+					.catch( (err) => {
+						if (err instanceof MoleculerError)
+							return Promise.reject(err);
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
 			}
 		},
 
@@ -260,14 +314,14 @@ module.exports = {
 
 	methods: {
 
-		verifyIfLogged(ctx){
+		verifyIfLogged(ctx) {
 			if (ctx.meta.user !== undefined)
 				return this.requestSuccess("User Logged", true);
 			else
 				return this.requestError(CodeTypes.USERS_NOT_LOGGED_ERROR);
 		},
 
-		verifyWealarId(ctx){
+		verifyWealarId(ctx) {
 			return this.DB_Users.findById(ctx, {
 					id: ctx.params.wealarId
 				})
@@ -275,6 +329,23 @@ module.exports = {
 				.catch( (err) => {
 					if (err.name === 'Nothing Found')
 						return this.requestError(CodeTypes.USERS_NOTHING_FOUND);
+					else
+						return this.requestError(CodeTypes.UNKOWN_ERROR);
+				});
+		},
+
+		insertPresence(ctx, id) {
+			return this.DB_Presence.findOne(ctx, {
+					query: {
+						wealarId: id
+					}
+				})
+				.catch( (err) => {
+					if (err.name === 'Nothing Found')
+						return this.DB_Presence.insert(ctx, {
+							wealarId: id,
+							presence: Default_Data
+						})
 					else
 						return this.requestError(CodeTypes.UNKOWN_ERROR);
 				});
