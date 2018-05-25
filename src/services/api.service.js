@@ -40,7 +40,7 @@ module.exports = {
 				whitelist: [
 					"auth.login",
 					"users.create",
-					"product.postTest"
+					"product.postTest",
 				],
 				aliases: {
 					// Auth: login only
@@ -60,10 +60,11 @@ module.exports = {
 					"product.*"
 				],
 				aliases: {
-          "POST alarm/:mode": "product.alarm",
-          "POST off": "product.off",
-          "POST presence": "product.presence",
-          "POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather"
+					"POST alarm/:mode": "product.alarm",
+					"POST off": "product.off",
+					"POST presence": "product.presence",
+					"POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather",
+					"Get weather": "product.getWeather"
 				}
 			},
 			{
