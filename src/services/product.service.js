@@ -52,50 +52,33 @@ module.exports = {
 							date: today
 						}
 					}))
-					.then( (res) => {
-						weather = res.data.weather;
-
-						return this.requestSuccess("Weather data retreived", res.data.wealarId);
-					})
 					.catch( (err) => {
 						if (err.name === 'Nothing Found')
 							return this.DB_Weather.insert(ctx, {
 								wealarId: ctx.params.wealarId,
 								date: today,
+								day: this.getDay(),
 								weather: Default_Data
 							})
 						else
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
 					})
-					.then( (res) => {
-						weather.push({
-							hour: this.getTime(),
-							infos: {
-								temperature: parseInt(ctx.params.temperature, 10),
-								humidity: parseInt(ctx.params.humidity, 10),
-								night: (ctx.params.night === "1")
-							}
-						});
-
-						return this.requestSuccess("Weather data formated", true);
-					})
-					.then( () => this.DB_Weather.removeMany(ctx, {
-						wealarId: ctx.params.wealarId,
-						date: { $lt: today-6 }
-					}))
-					.then( () => this.DB_Weather.updateMany(ctx, {
+					.then( () => this.requestSuccess("Weather data formated", [{
+						hour: this.getTime(),
+						infos: {
+							temperature: parseInt(ctx.params.temperature, 10),
+							humidity: parseInt(ctx.params.humidity, 10),
+							night: (ctx.params.night === "1")
+						}
+					}]))
+					.then( (res) => this.DB_Weather.updateMany(ctx, {
 						wealarId: ctx.params.wealarId,
 						date: today
 					}, {
-						weather: weather
+						weather: res.data
 					}))
-					.catch( (err) => {
-						if (err instanceof MoleculerError)
-							return Promise.reject(err);
-						else
-							return this.requestError(CodeTypes.UNKOWN_ERROR);
-					})
-					.then( () => "Done");
+					.then( () => "Done" )
+					.catch( (err) => CodeTypes.UNKOWN_ERROR );
 			}
 		},
 
@@ -271,14 +254,27 @@ module.exports = {
 				});
 		},
 
+		twoDigitString(value) {
+			if (value > 9)
+				return `${value}`;
+			else
+				return `0${value}`;
+		},
+
+		getDay(){
+			return (new Date()).getDay();
+		},
+
 		getDate(){
-			return (new Date()).getDate();
+			var date = new Date();
+
+			return this.twoDigitString(date.getDate())+"/"+this.twoDigitString(date.getMonth())+"/"+date.getFullYear();
 		},
 
 		getTime(){
 			var date = new Date();
 
-			return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+			return this.twoDigitString(date.getHours()) + ":" + this.twoDigitString(date.getMinutes()) + ":" + this.twoDigitString(date.getSeconds());
 		}
 
 	},

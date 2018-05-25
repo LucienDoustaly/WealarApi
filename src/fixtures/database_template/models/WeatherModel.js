@@ -22,6 +22,11 @@ module.exports = {
 		},
 
 		date: {
+			type: Sequelize.STRING(8),
+			allowNull: false
+		},
+
+		day: {
 			type: Sequelize.INTEGER,
 			allowNull: false
 		},
