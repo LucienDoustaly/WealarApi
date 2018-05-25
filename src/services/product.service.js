@@ -25,6 +25,8 @@ const Default_Data = {
 	data: []
 };
 
+const Days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 
 
 module.exports = {
@@ -133,18 +135,29 @@ module.exports = {
 			}
 		},
 
-		getAllWeather: {
+		getWeather: {
 			params: {
 
 			},
 			handler(ctx) {
+				var today = this.getDate();
+
 				return this.verifyIfLogged(ctx)
-					.then( () => this.DB_Weather.find(ctx, {
+					.then( () => this.DB_Weather.findOne(ctx, {
 						query: {
-							wealarId: ctx.meta.user.id
+							wealarId: ctx.meta.user.id,
+							date: today
 						}
 					}))
-					.then( (res) => this.requestSuccess("Search Complete", res.data) )
+					.then( (res) => this.requestSuccess("Search Complete", {
+						weather: {
+							temperature: res.data.weather[0].infos.temperature,
+							humidity: res.data.weather[0].infos.humidity,
+							night: res.data.weather[0].infos.night,
+							date: res.data.date,
+							day: Days[res.data.day]
+						}
+					}))
 					.catch( (err) => {
 						if (err.name === 'Nothing Found')
 							return this.requestError(CodeTypes.WEATHER_NOTHING_FOUND);
@@ -154,18 +167,29 @@ module.exports = {
 			}
 		},
 
-		getAllPresence: {
+		getPresence: {
 			params: {
 
 			},
 			handler(ctx) {
+				var today = this.getDate();
+
 				return this.verifyIfLogged(ctx)
-					.then( () => this.DB_Presence.find(ctx, {
+					/*.then( () => this.DB_Presence.findOne(ctx, {
 						query: {
-							wealarId: ctx.meta.user.id
+							wealarId: ctx.meta.user.id,
+							date: today
 						}
 					}))
-					.then( (res) => this.requestSuccess("Search Complete", res.data) )
+					.then( (res) => this.requestSuccess("Search Complete", {
+						weather: {
+							temperature: res.data.weather[0].infos.temperature,
+							humidity: res.data.weather[0].infos.humidity,
+							night: res.data.weather[0].infos.night,
+							date: res.data.date,
+							day: Days[res.data.day]
+						}
+					}))*/
 					.catch( (err) => {
 						if (err.name === 'Nothing Found')
 							return this.requestError(CodeTypes.PRESENCE_NOTHING_FOUND);
