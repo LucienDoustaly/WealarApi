@@ -64,7 +64,7 @@ module.exports = {
 					"POST off": "product.off",
 					"POST presence": "product.presence",
 					"POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather",
-					"Get weather": "product.getWeather"
+					"GET weather": "product.getWeather"
 				}
 			},
 			{
