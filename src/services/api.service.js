@@ -79,7 +79,8 @@ module.exports = {
 				],
 				aliases: {
 					"GET weather": "product.getWeather",
-					"GET alarm": "product.getAlarm"
+					"GET alarm": "product.getAlarm",
+					"PUT alarm": "product.ignorePresence"
 				}
 			},
 			{

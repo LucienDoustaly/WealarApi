@@ -154,7 +154,7 @@ module.exports = {
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
 					});
 			}
-		},
+		},*/
 
 		ignorePresence: {
 			params: {
@@ -162,23 +162,34 @@ module.exports = {
 			},
 			handler(ctx) {
 				return this.verifyIfLogged(ctx)
-					.then( () => this.insertPresence(ctx, ctx.meta.user.id) )
-					.then( () => this.DB_Presence.updateMany(ctx, {
+					.then( () => this.DB_Alarm.findOne(ctx, {
+						query: {
+							wealarId: ctx.meta.user.id
+						}
+					}))
+					.then( (res) => this.DB_Alarm.updateMany(ctx, {
 						wealarId: ctx.meta.user.id
 					}, {
-						new: false,
-						presence: Default_Data
+						alarm: [{
+							"hour": res.data.alarm[0].hour,
+							"infos": {
+								"new": false,
+								"activated": res.data.alarm[0].infos.activated
+							}
+						}]
 					}))
 					.then( () => this.requestSuccess("Presence ignored", true) )
 					.catch( (err) => {
 						if (err instanceof MoleculerError)
 							return Promise.reject(err);
+						else if (err.name === 'Nothing Found')
+							return this.requestError(CodeTypes.PRESENCE_NOTHING_FOUND);
 						else
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
 					});
 			}
 		},
-
+		/*
 		setAlarm: {
 			params: {
 				wealarId: "string",
