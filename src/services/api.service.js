@@ -61,6 +61,7 @@ module.exports = {
 				],
 				aliases: {
 					"POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather",
+					"POST alarm/:wealarId/:state/:notif": "product.addAlarm",
 					"POST presence/:wealarId": "product.addPresence",
 					"POST alarm/:wealarId/:mode": "product.setAlarm",
 					"POST off/:wealarId": "product.stopAlarm",
@@ -77,7 +78,8 @@ module.exports = {
 					"product.*"
 				],
 				aliases: {
-					"GET weather": "product.getWeather"
+					"GET weather": "product.getWeather",
+					"GET alarm": "product.getAlarm"
 				}
 			},
 			{

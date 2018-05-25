@@ -8,7 +8,7 @@ const Sequelize = require("sequelize");
 
 
 module.exports = {
-	name: "presence_info",
+	name: "alarm_info",
 	define: {
 		id: { // id must always exist
 			type: Sequelize.UUID, // Uses uuidv4 by default (default value is recommended)
@@ -21,19 +21,17 @@ module.exports = {
 			allowNull: false
 		},
 
-		activated: {
-			type: Sequelize.BOOLEAN,
-			allowNull: false,
-			defaultValue: false
+		date: {
+			type: Sequelize.STRING(10),
+			allowNull: false
 		},
 
-		new: {
-			type: Sequelize.BOOLEAN,
-			allowNull: false,
-			defaultValue: false
+		day: {
+			type: Sequelize.INTEGER,
+			allowNull: false
 		},
 
-		presence: {
+		alarm: {
 			type: Sequelize.JSON,
 			allowNull: false
 		}

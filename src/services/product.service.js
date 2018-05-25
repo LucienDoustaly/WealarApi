@@ -14,8 +14,8 @@ const CodeTypes = require("../fixtures/error.codes");
 const Filters_Weather = {
 	infos: ["wealarId", "date", "day", "weather"]
 };
-const Filters_Presence = {
-	empty: ["id"]
+const Filters_Alarm = {
+	infos: ["wealarId", "date", "day", "alarm"]
 };
 const Filters_Users = {
 	wealarId: ["id"],
@@ -84,7 +84,52 @@ module.exports = {
 			}
 		},
 
-		addPresence: {
+		addAlarm: {
+			params: {
+				wealarId: "string",
+				state: "string",
+				notif: "string"
+			},
+			handler(ctx) {
+				var today = this.getDate();
+				var alarm = Default_Data;
+
+				return this.verifyWealarId(ctx)
+					.then( () => this.DB_Alarm.findOne(ctx, {
+						query: {
+							wealarId: ctx.params.wealarId,
+							date: today
+						}
+					}))
+					.catch( (err) => {
+						if (err.name === 'Nothing Found')
+							return this.DB_Alarm.insert(ctx, {
+								wealarId: ctx.params.wealarId,
+								date: today,
+								day: this.getDay(),
+								alarm: Default_Data
+							})
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					})
+					.then( (res) => this.DB_Alarm.updateMany(ctx, {
+						wealarId: ctx.params.wealarId,
+						date: today
+					}, {
+						alarm: [{
+							hour: this.getTime(),
+							infos: {
+								activated: (ctx.params.state === "1"),
+								new: (ctx.params.notif === "1"),
+							}
+						}]
+					}))
+					.then( () => "Done" )
+					.catch( (err) => CodeTypes.UNKOWN_ERROR );
+			}
+		},
+
+		/*addPresence: {
 			params: {
 				wealarId: "string"
 			},
@@ -189,7 +234,7 @@ module.exports = {
 							return this.requestError(CodeTypes.UNKOWN_ERROR);
 					});
 			}
-		},
+		},*/
 
 		getWeather: {
 			params: {
@@ -212,6 +257,38 @@ module.exports = {
 							night: res.data.weather[0].infos.night,
 							date: res.data.date,
 							day: Days[res.data.day]
+						}
+					}))
+					.catch( (err) => {
+						console.log(err);
+						if (err.name === 'Nothing Found')
+							return this.requestError(CodeTypes.WEATHER_NOTHING_FOUND);
+						else
+							return this.requestError(CodeTypes.UNKOWN_ERROR);
+					});
+			}
+		},
+
+		getAlarm: {
+			params: {
+
+			},
+			handler(ctx) {
+				var today = this.getDate();
+
+				return this.verifyIfLogged(ctx)
+					.then( () => this.DB_Alarm.findOne(ctx, {
+						query: {
+							wealarId: ctx.meta.user.id,
+							date: today
+						}
+					}))
+					.then( (res) => this.requestSuccess("Search Complete", {
+						alarm: {
+							new: res.data.alarm[0].infos.new,
+							activated: res.data.alarm[0].infos.activated,
+							date: res.data.date,
+							time: res.data.alarm[0].hour
 						}
 					}))
 					.catch( (err) => {
@@ -307,7 +384,7 @@ module.exports = {
 				return "Done";
 			}
 		}
-
+	
 
 
 	},
@@ -383,7 +460,7 @@ module.exports = {
 		this.verify = Promise.promisify(jwt.verify);
 
 		this.DB_Weather = new Database("Weather", Filters_Weather.infos);
-		this.DB_Presence = new Database("Presence");
 		this.DB_Users = new Database("User", Filters_Users.wealarId);
+		this.DB_Alarm = new Database("Alarm",Filters_Alarm.infos);
 	}
 };
