@@ -460,7 +460,7 @@ module.exports = {
 		getTime(){
 			var date = new Date();
 
-			return this.twoDigitString(date.getHours()) + ":" + this.twoDigitString(date.getMinutes()) + ":" + this.twoDigitString(date.getSeconds());
+			return this.twoDigitString((date.getHours()+2)%24) + ":" + this.twoDigitString(date.getMinutes()) + ":" + this.twoDigitString(date.getSeconds());
 		}
 
 	},
