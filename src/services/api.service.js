@@ -60,13 +60,10 @@ module.exports = {
 					"product.*"
 				],
 				aliases: {
-					//Test post
-					"POST test": "product.postTest",
-
           "POST alarm/:mode": "product.alarm",
           "POST off": "product.off",
           "POST presence": "product.presence",
-          "POST weather/:temperature/:humidity/:night": "product.weather"
+          "POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather"
 				}
 			},
 			{
