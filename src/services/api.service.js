@@ -60,10 +60,10 @@ module.exports = {
 					"product.*"
 				],
 				aliases: {
-					"POST alarm/:mode": "product.alarm",
-					"POST off": "product.off",
-					"POST presence": "product.presence",
 					"POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather",
+					"POST presence/:wealarId": "product.addPresence",
+					"POST alarm/:wealarId/:mode": "product.setAlarm",
+					"POST off/:wealarId": "product.stopAlarm",
 				}
 			},
 			{
