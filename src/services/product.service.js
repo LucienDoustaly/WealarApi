@@ -12,7 +12,7 @@ const CodeTypes = require("../fixtures/error.codes");
 // Filters applied when searching for entities
 // Elements correspond to the columns of the table
 const Filters_Weather = {
-	infos: ["wealarId", "date", "weather"]
+	infos: ["wealarId", "date", "day", "weather"]
 };
 const Filters_Presence = {
 	empty: ["id"]
