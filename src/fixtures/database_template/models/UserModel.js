@@ -42,12 +42,6 @@ module.exports = {
 		preferences: {
 			type: Sequelize.JSON,
 			allowNull: false
-		},
-
-		alarm: {
-			type: Sequelize.BOOLEAN,
-			allowNull: false,
-			defaultValue: false
 		}
 	},
 	options: {
