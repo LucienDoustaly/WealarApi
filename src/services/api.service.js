@@ -64,6 +64,18 @@ module.exports = {
 					"POST off": "product.off",
 					"POST presence": "product.presence",
 					"POST weather/:wealarId/:temperature/:humidity/:night": "product.addWeather",
+				}
+			},
+			{
+				bodyParsers: {
+					json: true,
+				},
+				path: "/data/",
+				authorization: true,
+				whitelist: [
+					"product.*"
+				],
+				aliases: {
 					"GET weather": "product.getWeather"
 				}
 			},
