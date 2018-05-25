@@ -80,7 +80,9 @@ module.exports = {
 						weather: res.data
 					}))
 					.then( () => "Done" )
-					.catch( (err) => CodeTypes.UNKOWN_ERROR );
+					.catch( (err) => {
+						console.log(err);
+						return CodeTypes.UNKOWN_ERROR });
 			}
 		},
 
@@ -292,7 +294,7 @@ module.exports = {
 		getDate(){
 			var date = new Date();
 
-			return this.twoDigitString(date.getDate())+"/"+this.twoDigitString(date.getMonth())+"/"+date.getFullYear();
+			return this.twoDigitString(date.getDate())+"/"+this.twoDigitString(date.getMonth()+1)+"/"+date.getFullYear();
 		},
 
 		getTime(){
