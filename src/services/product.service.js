@@ -215,6 +215,7 @@ module.exports = {
 						}
 					}))
 					.catch( (err) => {
+						console.log(err);
 						if (err.name === 'Nothing Found')
 							return this.requestError(CodeTypes.WEATHER_NOTHING_FOUND);
 						else
