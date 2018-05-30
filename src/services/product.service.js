@@ -257,8 +257,7 @@ module.exports = {
 				return this.verifyIfLogged(ctx)
 					.then( () => this.DB_Weather.findOne(ctx, {
 						query: {
-							wealarId: ctx.meta.user.id,
-							date: today
+							wealarId: ctx.meta.user.id
 						}
 					}))
 					.then( (res) => this.requestSuccess("Search Complete", {
@@ -290,8 +289,7 @@ module.exports = {
 				return this.verifyIfLogged(ctx)
 					.then( () => this.DB_Alarm.findOne(ctx, {
 						query: {
-							wealarId: ctx.meta.user.id,
-							date: today
+							wealarId: ctx.meta.user.id
 						}
 					}))
 					.then( (res) => this.requestSuccess("Search Complete", {
